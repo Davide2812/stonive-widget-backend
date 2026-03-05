@@ -11,7 +11,7 @@ export default async function handler(req, res) {
     return res.status(405).json({ error: 'Method not allowed' });
   }
 
-  const { pin, width, length, thickness, price } = req.body;
+  const { pin, width, length, thickness, price, quantity } = req.body;
 
   if (pin !== process.env.UNLOCK_PIN) {
     return res.status(401).json({ error: 'PIN non valido' });
@@ -21,6 +21,7 @@ export default async function handler(req, res) {
   const l = String(length).padStart(3, '0');
   const h = String(thickness).padStart(2, '0');
   const sku = `SU-MISURA-W${w}-L${l}-H${h}`;
+  const qty = parseInt(quantity) || 1;
 
   const shopifyUrl = `https://${process.env.SHOPIFY_STORE}/admin/api/2024-01/draft_orders.json`;
 
@@ -28,9 +29,9 @@ export default async function handler(req, res) {
     draft_order: {
       line_items: [
         {
-          title: `Materasso Su Misura (${width}×${length}×${thickness} cm)`,
+          title: `Su Misura (${width}×${length}×${thickness} cm)`,
           price: price,
-          quantity: 1,
+          quantity: qty,
           requires_shipping: true,
           taxable: true,
           properties: [
